@@ -1,0 +1,9 @@
+[tool]
+id = "com.thelightphone.tracker"
+label = "Tracker"
+versionCode = 27
+versionName = "1.8.4"
+permissions = []
+# change if you run this on an LP3!
+# serverPackage = "com.lightos"
+serverPackage = "com.thelightphone.sdk.emulator"
