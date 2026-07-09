@@ -1,0 +1,9 @@
+[tool]
+id = "com.tyshi00.aventura"
+label = "Aventura"
+versionCode = 3
+versionName = "1.1.1"
+permissions = []
+# change if you run this on an LP3!
+# serverPackage = "com.lightos"
+serverPackage = "com.thelightphone.sdk.emulator"
