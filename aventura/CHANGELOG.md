@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.2
+- Moved the settings toggle icons to the left of their labels, matching how LightOS's own settings screens lay out toggles on the actual hardware
+
 ## 1.1.1
 - Fixed the completed-quest checkmark: Light's ACCEPT icon was rendering as a solid triangle instead of a hollow tick (missing `fillType="evenOdd"` in the SDK's own asset), swapped it for a small custom checkmark drawn just for this
 

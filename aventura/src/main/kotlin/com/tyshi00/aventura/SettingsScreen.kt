@@ -4,9 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -178,13 +180,14 @@ private fun ToggleRow(label: String, checked: Boolean, onClick: () -> Unit) {
             .padding(vertical = 0.75f.gridUnitsAsDp()),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        LightIcon(
+            icon = if (checked) LightIcons.TOGGLE_OFF else LightIcons.TOGGLE_ON,
+        )
+        Spacer(modifier = Modifier.width(1f.gridUnitsAsDp()))
         LightText(
             text = label,
             variant = LightTextVariant.Copy,
             modifier = Modifier.weight(1f),
-        )
-        LightIcon(
-            icon = if (checked) LightIcons.TOGGLE_OFF else LightIcons.TOGGLE_ON,
         )
     }
 }
