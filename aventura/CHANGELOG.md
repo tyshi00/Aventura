@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.3
+- Moved the settings icon to the leftmost slot of the bottom bar, matching LightOS's own layout convention
+
 ## 1.1.2
 - Moved the settings toggle icons to the left of their labels, matching how LightOS's own settings screens lay out toggles on the actual hardware
 

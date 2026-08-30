@@ -172,14 +172,14 @@ class HomeScreen(sealedActivity: SealedLightActivity) :
 
                 LightBottomBar(
                     items = listOf(
-                        null,
-                        null,
-                        null,
-                        null,
                         LightBarButton.LightIcon(
                             icon = LightIcons.SETTINGS,
                             onClick = { navigateTo(screenFactory = { SettingsScreen(it, repo) }) },
                         ),
+                        null,
+                        null,
+                        null,
+                        null,
                     ),
                 )
             }
