@@ -1,18 +1,13 @@
 package com.tyshi00.aventura
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
 import com.thelightphone.sdk.LightScreen
@@ -21,11 +16,8 @@ import com.thelightphone.sdk.SealedLightActivity
 import com.thelightphone.sdk.SimpleLightScreen
 import com.thelightphone.sdk.ui.LightBarButton
 import com.thelightphone.sdk.ui.LightBottomBar
-import com.thelightphone.sdk.ui.LightIcon
 import com.thelightphone.sdk.ui.LightIcons
 import com.thelightphone.sdk.ui.LightScrollView
-import com.thelightphone.sdk.ui.LightText
-import com.thelightphone.sdk.ui.LightTextVariant
 import com.thelightphone.sdk.ui.LightTheme
 import com.thelightphone.sdk.ui.LightThemeController
 import com.thelightphone.sdk.ui.LightThemeTokens
@@ -111,83 +103,62 @@ class SettingsScreen(
                     .fillMaxSize()
                     .background(LightThemeTokens.colors.background),
             ) {
+                // Settings-style screens start their list right under the bar, with no extra gap.
+                // Each row carries its own 1.3 unit padding, like LightOS's settings screens.
                 LightTopBar(
                     leftButton = LightBarButton.LightIcon(
                         icon = LightIcons.BACK,
                         onClick = { goBack() },
                     ),
                     center = LightTopBarCenter.Text("Settings"),
-                    modifier = Modifier.padding(bottom = 1f.gridUnitsAsDp()),
                 )
 
                 LightScrollView(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .padding(horizontal = 1f.gridUnitsAsDp()),
+                        .padding(start = OPTION_START_UNITS.gridUnitsAsDp()),
                 ) {
-                    ToggleRow(
-                        label = "Invert colors",
-                        checked = state.invertColors,
+                    OptionRow(
+                        title = "Invert colors",
+                        icon = toggleIcon(state.invertColors),
                         onClick = { viewModel.toggleInvertColors() },
                     )
-                    ToggleRow(
-                        label = "Show streaks",
-                        checked = state.showStreaks,
+                    OptionRow(
+                        title = "Show streaks",
+                        icon = toggleIcon(state.showStreaks),
                         onClick = { viewModel.toggleShowStreaks() },
                     )
-                    ToggleRow(
-                        label = "Show trophies",
-                        checked = state.showTrophies,
+                    OptionRow(
+                        title = "Show trophies",
+                        icon = toggleIcon(state.showTrophies),
                         onClick = { viewModel.toggleShowTrophies() },
                     )
-
-                    LightText(
-                        text = "Reset all data",
-                        variant = LightTextVariant.Copy,
-                        lighten = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                navigateTo(
-                                    screenFactory = {
-                                        ConfirmResetScreen(
-                                            it,
-                                            "Reset all data? This will permanently clear your quest history, level, and streak.",
-                                        )
-                                    },
-                                    resultCallback = { confirmed ->
-                                        if (confirmed == true) viewModel.resetAll()
-                                    },
-                                )
-                            }
-                            .padding(vertical = 0.75f.gridUnitsAsDp()),
+                    OptionRow(
+                        title = "Backup & restore",
+                        onClick = { navigateTo(screenFactory = { BackupScreen(it, repo) }) },
+                    )
+                    OptionRow(
+                        title = "Reset all data",
+                        dimmed = true,
+                        onClick = {
+                            navigateTo(
+                                screenFactory = {
+                                    ConfirmResetScreen(
+                                        it,
+                                        "Reset all data? This will permanently clear your quest history, level, and streak. Saved backups are not deleted.",
+                                    )
+                                },
+                                resultCallback = { confirmed ->
+                                    if (confirmed) viewModel.resetAll()
+                                },
+                            )
+                        },
                     )
                 }
 
                 LightBottomBar(items = listOf())
             }
         }
-    }
-}
-
-@Composable
-private fun ToggleRow(label: String, checked: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = 0.75f.gridUnitsAsDp()),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        LightIcon(
-            icon = if (checked) LightIcons.TOGGLE_OFF else LightIcons.TOGGLE_ON,
-        )
-        Spacer(modifier = Modifier.width(1f.gridUnitsAsDp()))
-        LightText(
-            text = label,
-            variant = LightTextVariant.Copy,
-            modifier = Modifier.weight(1f),
-        )
     }
 }

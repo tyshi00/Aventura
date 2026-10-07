@@ -1,17 +1,17 @@
 # Aventura
 
-A little quest app for the Light Phone III. Every day, week, and month it hands you a short list of things to actually go do, things like finding a flower nobody planted, talking to a stranger, or planning a day trip somewhere new. Check them off as you finish them, watch your level go up, and build a streak.
+A quest app for the Light Phone III. Every day, week, and month it gives you a short list of things to go do, like finding a flower nobody planted, talking to a stranger, or planning a day trip. Check them off, level up, and build a streak. No overlays, no nagging notifications, no algorithm.
 
-No overlays, no notifications nagging you, no algorithm. You open it, you see what's on the list, you go do the thing.
+This is the app module. See the [main README](../README.md) for the full repo overview.
 
-## What it does
+## Features
 
-- **Daily, weekly, and monthly quests.** 3 a day, 4 a week, 12 a month, pulled from a pool of over 300. The set is picked automatically based on the date so it stays the same all day (or week, or month) and then rotates to a fresh batch when the period ends. Nobody has to manage this, it just works in the background.
-- **XP and levels.** Finishing a quest earns XP, daily quests are worth the least and monthly quests the most. Twelve levels total, starting at "Plugged in" and ending at "Reconnected."
-- **Streaks.** Finish at least one quest a day and your streak keeps climbing. Keep it going long enough and you start earning bonus XP on top of the normal reward.
-- **Trophies.** 22 of them, for things like finishing your first quest, clearing every quest in a single day, or keeping a streak alive for a month straight.
-- **Progress screen.** Your level, your streak, every trophy you've earned (and haven't), and a full history of everything you've completed.
-- **Settings.** Flip to a light theme if that's more your thing, turn streaks or trophies off if you just want the quests without the game layer, or wipe your data and start over.
+- **Daily, weekly, and monthly quests**: 3 a day, 4 a week, and 12 a month, drawn from a pool of over 300. Each set is picked from the date, stays the same for the whole period, and rotates when the period ends. No management needed.
+- **XP and levels**: finishing a quest earns XP. Daily quests are worth the least and monthly quests the most. Fifteen levels, from "Plugged in" to "Offline Success."
+- **Streaks**: finish at least one quest a day to keep your streak climbing. Long streaks earn bonus XP on top of the normal reward.
+- **Trophies**: 22 in total, for things like finishing your first quest, clearing every quest in a day, or keeping a streak alive for a month.
+- **Progress screen**: your level, your streak, every trophy earned and unearned, and a full history of completed quests.
+- **Settings**: switch to a light theme, turn streaks or trophies off to keep only the quests, back up your data (inside the app and as dated files in Documents/Aventura, plus an automatic daily backup) and restore it later, or reset everything.
 
 ## Screenshots
 
@@ -26,12 +26,22 @@ No overlays, no notifications nagging you, no algorithm. You open it, you see wh
 </tr>
 </table>
 
-## Credit where it's due
+## Installation
 
-Aventura is a Light Phone port of [Soto](https://codeberg.org/potentialuselessness/Soto/src/branch/main), an Android app that raises a full screen quest prompt whenever your phone loses its connection to the internet. All the credit for the actual idea, the quest writing, and the XP and trophy design goes to Soto. Its quest pool is the foundation this whole app is built on.
+See [Installation](../README.md#installation) in the main README.
 
-The Light Phone III doesn't allow apps to watch for a lost connection or take over the screen the way Soto does on Android, so Aventura works a little differently. Instead of popping up when you go offline, it's just sitting there in your tools list waiting for you to open it, since the Light Phone is already the disconnected device. A batch of extra month-long quests was also added on top of Soto's original pool, since the monthly list was small enough that it started repeating sooner than the daily and weekly ones did.
+## Credits
 
-## Using it
+Built on the [Light SDK](https://github.com/lightphone/light-sdk) by The Light Phone (MIT). The original copyright notice is kept in [LICENSE](../LICENSE), and the SDK's own README is kept in [README.light-sdk.md](../README.light-sdk.md).
 
-Install the APK on your Light Phone III.
+Aventura is a Light Phone port of [Soto](https://codeberg.org/potentialuselessness/Soto/src/branch/main), an Android app that shows a full-screen quest prompt whenever your phone loses its internet connection. Credit for the idea, the quest writing, and the XP and trophy design goes to Soto, and its quest pool is the foundation of this app. Used with permission from the Soto author.
+
+The Light Phone III doesn't let apps watch for a lost connection or take over the screen, so Aventura waits in your tools list instead, since the Light Phone is already the disconnected device. Extra monthly quests were added to Soto's pool because the original monthly list repeated sooner than the daily and weekly ones.
+
+## License
+
+MIT. See [LICENSE](../LICENSE).
+
+## Disclaimer
+
+Unofficial, independent open-source project — not affiliated with or endorsed by The Light Phone, Inc. Light Phone and Light OS are trademarks of The Light Phone, Inc.

@@ -43,6 +43,9 @@ interface CompletedQuestDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: CompletedQuestEntry)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entries: List<CompletedQuestEntry>)
+
     @Query("DELETE FROM completed_quests WHERE completionKey = :completionKey")
     suspend fun deleteByCompletionKey(completionKey: String)
 

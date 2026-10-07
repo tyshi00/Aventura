@@ -1,9 +1,10 @@
 [tool]
 id = "com.tyshi00.aventura"
 label = "Aventura"
-versionCode = 5
-versionName = "1.1.3"
+versionCode = 7
+versionName = "1.3.0"
 permissions = []
-# change if you run this on an LP3!
-# serverPackage = "com.lightos"
-serverPackage = "com.thelightphone.sdk.emulator"
+# Real Light Phone III hardware.
+serverPackage = "com.lightos"
+# For the Android Studio emulator instead, use:
+# serverPackage = "com.thelightphone.sdk.emulator"

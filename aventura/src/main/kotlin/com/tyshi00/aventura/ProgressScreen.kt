@@ -78,7 +78,7 @@ class ProgressScreen(
         val level = remember(stats) { Levels.forXp(stats.totalXp) }
         val next = remember(level) { Levels.next(level) }
         val unlocked = remember(state.history) { Trophies.unlocked(state.history) }
-        val entries = remember(state.history) { state.history.sortedByDescending { it.completedAtMillis } }
+        val entries = remember(state.history) { state.history.newest(HISTORY_SHOWN) }
 
         LightTheme(colors = themeColors) {
             Column(
@@ -131,7 +131,7 @@ class ProgressScreen(
                         Spacer(modifier = Modifier.height(0.5f.gridUnitsAsDp()))
                         Trophies.all.forEach { trophy ->
                             val isUnlocked = trophy.id in unlocked
-                            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 0.25f.gridUnitsAsDp())) {
+                            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 0.75f.gridUnitsAsDp())) {
                                 Column {
                                     LightText(
                                         text = if (isUnlocked) "[x] ${trophy.name}" else "[ ] ${trophy.name}",
@@ -151,7 +151,11 @@ class ProgressScreen(
                     Spacer(modifier = Modifier.height(1.5f.gridUnitsAsDp()))
 
                     LightText(
-                        text = "HISTORY  ${entries.size}",
+                        text = if (state.history.size > entries.size) {
+                            "HISTORY  newest ${entries.size} of ${state.history.size}"
+                        } else {
+                            "HISTORY  ${entries.size}"
+                        },
                         variant = LightTextVariant.Detail,
                         lighten = true,
                     )
@@ -167,14 +171,22 @@ class ProgressScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 0.35f.gridUnitsAsDp()),
+                                    .padding(vertical = 0.75f.gridUnitsAsDp()),
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     LightText(text = formatDate(entry.completedAtMillis), variant = LightTextVariant.Superfine, lighten = true)
-                                    LightText(text = entry.title, variant = LightTextVariant.Fine)
+                                    LightText(text = entry.title, variant = LightTextVariant.Copy)
                                 }
                                 LightText(text = "+${entry.xp}", variant = LightTextVariant.Fine, lighten = true)
                             }
+                        }
+                        if (state.history.size > entries.size) {
+                            LightText(
+                                text = "Older entries are not listed, but they still count toward your level, streak, and trophies.",
+                                variant = LightTextVariant.Detail,
+                                lighten = true,
+                                modifier = Modifier.padding(top = 0.5f.gridUnitsAsDp()),
+                            )
                         }
                     }
                     Spacer(modifier = Modifier.height(1f.gridUnitsAsDp()))
@@ -185,6 +197,9 @@ class ProgressScreen(
         }
     }
 }
+
+/** How many history entries the Progress screen lists. Display only, nothing is deleted. */
+private const val HISTORY_SHOWN = 30
 
 private fun formatDate(millis: Long): String =
     Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate().toString()

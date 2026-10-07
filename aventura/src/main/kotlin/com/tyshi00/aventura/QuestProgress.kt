@@ -34,9 +34,14 @@ object Levels {
         Level(10, "In the mix", 8200),
         Level(11, "Involved", 11000),
         Level(12, "Reconnected", 14500),
+        // Levels 13 to 15 are Aventura's own. Levels 1 to 12 must never change: nobody's level moves.
+        Level(13, "Rooted", 18500),
+        Level(14, "Unhurried", 23000),
+        Level(15, "Offline Success", 28000),
     )
 
-    fun forXp(xp: Int): Level = all.last { xp >= it.minXp }
+    /** Never throws: a total below the first level (or a corrupted one) just maps to level 1. */
+    fun forXp(xp: Int): Level = all.lastOrNull { xp >= it.minXp } ?: all.first()
 
     /** The level after this one, or null if already at the top. */
     fun next(level: Level): Level? = all.getOrNull(level.number)
@@ -97,9 +102,20 @@ object Streak {
     }
 }
 
+/** Added up as a Long and clamped, so even bad data can't overflow into a negative total. */
+fun List<CompletedQuestEntry>.totalXp(): Int =
+    sumOf { it.xp.toLong() }.coerceIn(0L, Int.MAX_VALUE.toLong()).toInt()
+
+/**
+ * The newest [limit] entries, newest first. This is only for what the Progress screen lists. Level,
+ * streaks, and trophies are always worked out from the full history, so nothing is ever dropped.
+ */
+fun List<CompletedQuestEntry>.newest(limit: Int): List<CompletedQuestEntry> =
+    sortedByDescending { it.completedAtMillis }.take(limit)
+
 fun List<CompletedQuestEntry>.stats(): ProgressStats = ProgressStats(
     total = size,
-    totalXp = sumOf { it.xp },
+    totalXp = totalXp(),
     daily = count { it.kind == "DAILY" },
     weekly = count { it.kind == "WEEKLY" },
     monthly = count { it.kind == "MONTHLY" },

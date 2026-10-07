@@ -1,7 +1,7 @@
 package com.tyshi00.aventura
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import com.thelightphone.sdk.ui.lightClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,9 +51,15 @@ import kotlinx.coroutines.launch
 data class HomeState(
     val history: List<CompletedQuestEntry> = emptyList(),
     val showStreaks: Boolean = true,
+    /** The leftover Documents/Aventura folder from an earlier install is here, but nothing in it can be opened. */
+    val reinstallHint: Boolean = false,
 )
 
-class HomeViewModel(private val repo: AventuraRepository) : LightViewModel<Unit>() {
+class HomeViewModel(
+    private val repo: AventuraRepository,
+    private val store: BackupStore,
+    private val folders: BackupFolders,
+) : LightViewModel<Unit>() {
 
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
@@ -66,7 +72,13 @@ class HomeViewModel(private val repo: AventuraRepository) : LightViewModel<Unit>
         viewModelScope.launch(Dispatchers.IO) {
             val invertColors = repo.getInvertColors()
             if (invertColors) LightThemeController.setLightTheme() else LightThemeController.setDarkTheme()
-            _state.value = HomeState(history = repo.getHistory(), showStreaks = repo.getShowStreaks())
+            val history = repo.getHistory()
+            // Always make the drop-off folder, so there is somewhere to copy a backup to after a reinstall.
+            runCatching { folders.ensureDropDir() }
+            val hint = history.isEmpty() && runCatching { folders.looksLikeReinstall() }.getOrDefault(false)
+            _state.value = HomeState(history = history, showStreaks = repo.getShowStreaks(), reinstallHint = hint)
+            // After the screen is up. A backup problem must never get in the way of the quest list.
+            runCatching { repo.autoBackupIfDue(store, folders, entryCount = history.size) }
         }
     }
 
@@ -91,7 +103,7 @@ class HomeScreen(sealedActivity: SealedLightActivity) :
     override val viewModelClass: Class<HomeViewModel>
         get() = HomeViewModel::class.java
 
-    override fun createViewModel() = HomeViewModel(repo)
+    override fun createViewModel() = HomeViewModel(repo, BackupStore(lightContext.fileShare), BackupFolders())
 
     @Composable
     override fun Content() {
@@ -102,7 +114,7 @@ class HomeScreen(sealedActivity: SealedLightActivity) :
         val completed = remember(state.history) {
             state.history.mapTo(HashSet()) { it.completionKey }
         }
-        val level = remember(state.history) { Levels.forXp(state.history.sumOf { it.xp }) }
+        val level = remember(state.history) { Levels.forXp(state.history.totalXp()) }
         val streak = remember(state.history) { Streak.current(state.history) }
         val selection = remember(tier) { QuestSelector.selectionFor(tier) }
         val doneCount = selection.count { it.completionKey in completed }
@@ -119,7 +131,7 @@ class HomeScreen(sealedActivity: SealedLightActivity) :
                         text = "LV ${level.number}",
                         onClick = { navigateTo(screenFactory = { ProgressScreen(it, repo) }) },
                     ),
-                    modifier = Modifier.padding(bottom = 0.25f.gridUnitsAsDp()),
+                    modifier = Modifier.padding(bottom = 1f.gridUnitsAsDp()),
                 )
 
                 if (state.showStreaks && streak > 0) {
@@ -131,6 +143,17 @@ class HomeScreen(sealedActivity: SealedLightActivity) :
                             horizontal = 1f.gridUnitsAsDp(),
                             vertical = 0.25f.gridUnitsAsDp(),
                         ),
+                    )
+                }
+
+                if (state.reinstallHint && state.history.isEmpty()) {
+                    LightText(
+                        text = "Aventura was installed here before. Tap to restore from a backup.",
+                        variant = LightTextVariant.Detail,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .lightClickable { navigateTo(screenFactory = { BackupScreen(it, repo) }) }
+                            .padding(horizontal = 1f.gridUnitsAsDp(), vertical = 0.5f.gridUnitsAsDp()),
                     )
                 }
 
@@ -165,7 +188,6 @@ class HomeScreen(sealedActivity: SealedLightActivity) :
                             done = item.completionKey in completed,
                             onToggle = { now -> viewModel.toggle(item, now) },
                         )
-                        Spacer(modifier = Modifier.height(1f.gridUnitsAsDp()))
                     }
                     Spacer(modifier = Modifier.height(1f.gridUnitsAsDp()))
                 }
@@ -199,7 +221,7 @@ private fun TierTabs(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .clickable { onSelect(t) }
+                    .lightClickable { onSelect(t) }
                     .padding(vertical = 0.5f.gridUnitsAsDp()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -222,7 +244,8 @@ private fun QuestCard(selected: SelectedQuest, done: Boolean, onToggle: (Boolean
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onToggle(!done) },
+            .lightClickable { onToggle(!done) }
+            .padding(vertical = 0.75f.gridUnitsAsDp()),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(contentAlignment = Alignment.Center) {

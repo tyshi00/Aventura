@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
+import com.thelightphone.sdk.ui.LocalHapticsEnabled
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -117,33 +120,36 @@ class LightActivity internal constructor() : ComponentActivity() {
             androidx.compose.runtime.LaunchedEffect(Unit) { contentReady = true }
             val saveableStateHolder = rememberSaveableStateHolder()
             saveableStateHolderRef = saveableStateHolder
+            val hapticsEnabled by rememberHapticsEnabled().collectAsState()
             val entry = currentScreen.value
             if (entry != null) {
                 val screen = entry.screen
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                    ) {
-                        // SaveableStateProvider (not bare key()) so a screen's UI
-                        // state — e.g. scroll position — survives navigating away
-                        // and back. key() only caches a single keyed subtree at a
-                        // time: navigating to a sub-screen discards the parent's
-                        // composition outright, so returning to it (even though
-                        // it's the same BackStackEntry) starts fresh, resetting
-                        // scroll position to the top. SaveableStateProvider keeps
-                        // each entry's state cached across such round trips, the
-                        // same mechanism Navigation-Compose's NavHost uses.
-                        saveableStateHolder.SaveableStateProvider(entry.id) {
-                            val content: @Composable () -> Unit = { screen.Content() }
-                            if (screen is ViewModelStoreOwner) {
-                                CompositionLocalProvider(
-                                    LocalViewModelStoreOwner provides screen,
-                                    content = content,
-                                )
-                            } else {
-                                content()
+                CompositionLocalProvider(LocalHapticsEnabled provides hapticsEnabled) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                        ) {
+                            // SaveableStateProvider (not bare key()) so a screen's UI
+                            // state — e.g. scroll position — survives navigating away
+                            // and back. key() only caches a single keyed subtree at a
+                            // time: navigating to a sub-screen discards the parent's
+                            // composition outright, so returning to it (even though
+                            // it's the same BackStackEntry) starts fresh, resetting
+                            // scroll position to the top. SaveableStateProvider keeps
+                            // each entry's state cached across such round trips, the
+                            // same mechanism Navigation-Compose's NavHost uses.
+                            saveableStateHolder.SaveableStateProvider(entry.id) {
+                                val content: @Composable () -> Unit = { screen.Content() }
+                                if (screen is ViewModelStoreOwner) {
+                                    CompositionLocalProvider(
+                                        LocalViewModelStoreOwner provides screen,
+                                        content = content,
+                                    )
+                                } else {
+                                    content()
+                                }
                             }
                         }
                     }
