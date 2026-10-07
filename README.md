@@ -53,11 +53,17 @@ Then build:
 
 ### Restoring after a reinstall
 
-Each backup is also saved as a dated file in `Documents/Aventura`, and Aventura saves one about once a day when you open it. Those files survive an uninstall. Android will not let a reinstalled app open them, so one copy has to be made by hand. Use your own file name:
+Each backup is also saved as a dated file in `Documents/Aventura`, and Aventura saves one about once a day when you open it. Those files survive an uninstall. Android will not let a reinstalled app open them, so one copy has to be made by hand over ADB:
 
 ```
 adb pull /sdcard/Documents/Aventura
-adb push aventura-auto-2026-10-06-182601.json /sdcard/Android/media/com.tyshi00.aventura/
+adb push <path-to-backup-file> /sdcard/Android/media/com.tyshi00.aventura/
+```
+
+Replace `<path-to-backup-file>` with the full path to the pulled backup on your computer. Backup names start with `aventura-manual` or `aventura-auto`. For example:
+
+```
+adb push C:\Users\you\AventuraBackups\aventura-manual-2026-10-06-195633.json /sdcard/Android/media/com.tyshi00.aventura/
 ```
 
 Then open Aventura, go to Settings, then Backup & restore, and tap Restore from folder. The same steps are shown on that screen.
